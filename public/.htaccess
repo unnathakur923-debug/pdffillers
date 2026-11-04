@@ -1,0 +1,37 @@
+# Hostinger Apache / LiteSpeed Web Server Configuration for DocuFill Studio
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Serve existing files and directories directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Fallback all other requests to index.html for Single Page Application (SPA) routing
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Caching and MIME Types for Static Assets
+<IfModule mod_headers.c>
+  # 1 year cache for static assets with hash
+  <FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|svg|webp|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "max-age=31536000, public"
+  </FilesMatch>
+
+  # Do not cache index.html or service workers
+  <FilesMatch "(index\.html|manifest\.json|ads\.txt)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+</IfModule>
+
+# Ensure correct MIME types
+<IfModule mod_mime.c>
+  AddType application/pdf .pdf
+  AddType image/png .png
+  AddType image/jpeg .jpg .jpeg
+  AddType application/manifest+json .webmanifest .json
+  AddType text/plain .txt
+</IfModule>

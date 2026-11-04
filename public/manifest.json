@@ -1,0 +1,16 @@
+{
+  "name": "DocuFill Studio - Precision PDF Form Filler",
+  "short_name": "DocuFill",
+  "description": "Fill every detail into official PDF forms with pixel-perfect letter-box alignment, checkmarks, photo and signature placement, live preview, and instant filled PDF download.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "/assets/aistudio/bom_account_opening_form_c38c522e.pdf",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

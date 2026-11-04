@@ -1,0 +1,6 @@
+{
+  "name": "DocuFill Studio - Precision PDF Form Filler & Exporter",
+  "description": "Fill every detail into official PDF forms with pixel-perfect letter-box alignment, checkmarks, photo and signature placement, live preview, and instant filled PDF download.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
