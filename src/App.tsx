@@ -19,8 +19,6 @@ import { ServicesSection } from './components/FormSections/ServicesSection';
 import { NominationSection } from './components/FormSections/NominationSection';
 import { PhotoUploader } from './components/PhotoUploader';
 import { WelcomeFlashModal } from './components/WelcomeFlashModal';
-import { DownloadCodeModal } from './components/DownloadCodeModal';
-import { generateStandaloneHtml, triggerFileDownload } from './utils/codeExporter';
 import { AdSenseBanner } from './components/AdSenseBanner';
 import { Footer } from './components/Footer';
 import {
@@ -39,7 +37,6 @@ import {
   FilePlus2,
   Phone,
   Eye,
-  FileCode,
 } from 'lucide-react';
 
 const STATEMENT_PDF_PATH = '/assets/aistudio/bank_account_statement_6b113566.pdf';
@@ -68,9 +65,6 @@ export default function App() {
 
   // Flash welcome screen on app launch
   const [showFlash, setShowFlash] = useState<boolean>(true);
-
-  // Download Code / HTML Modal
-  const [showDownloadCode, setShowDownloadCode] = useState<boolean>(false);
 
   // Mobile active tab view toggle: 'form' or 'pdf' preview
   const [mobileView, setMobileView] = useState<'form' | 'pdf'>('form');
@@ -426,12 +420,6 @@ export default function App() {
     setTimeout(() => setStatusMessage(null), 4000);
   };
 
-  const handleDirectDownloadHtml = useCallback(() => {
-    const html = generateStandaloneHtml();
-    triggerFileDownload(html, 'index.html', 'text/html;charset=utf-8');
-    setStatusMessage('Downloaded index.html! Simply upload this single file into Hostinger public_html to go live without any error.');
-    setTimeout(() => setStatusMessage(null), 6000);
-  }, []);
 
   const handleCustomPdfLoaded = (bytes: Uint8Array, fileName: string) => {
     setPdfTemplateBytes(bytes);
@@ -667,12 +655,6 @@ export default function App() {
         onEnter={() => setShowFlash(false)}
       />
 
-      {/* Download Full Code & HTML Hostinger Modal */}
-      <DownloadCodeModal
-        isOpen={showDownloadCode}
-        onClose={() => setShowDownloadCode(false)}
-      />
-
       {/* Top Header */}
       <Navbar
         onDownload={handleDownload}
@@ -680,8 +662,6 @@ export default function App() {
         onClear={handleClearForm}
         onFreshApplication={handleFreshApplication}
         onOpenWelcome={() => setShowFlash(true)}
-        onOpenDownloadCode={() => setShowDownloadCode(true)}
-        onDirectDownloadHtml={handleDirectDownloadHtml}
         hasData={Boolean(formData.firstName || formData.accountNumber || formData.primaryAccountNumber)}
         activeTemplate={activeTemplate}
         customSubtitle={getTemplateDisplayName()}
@@ -705,15 +685,6 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowDownloadCode(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-black shadow-xs transition-transform active:scale-95 cursor-pointer"
-                title="Download full project code in standalone HTML or Hostinger ZIP"
-              >
-                <FileCode className="w-3.5 h-3.5" />
-                <span>Download HTML Code</span>
-              </button>
               <a
                 href="tel:9970996060"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow-xs transition-transform active:scale-95"

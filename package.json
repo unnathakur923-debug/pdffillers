@@ -8,10 +8,11 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
     "start": "node server.js",
-    "build": "vite build && npx tsx scripts/export-html.ts && node scripts/bundle.js",
-    "package": "npx tsx scripts/export-html.ts && node scripts/bundle.js",
     "preview": "vite preview",
+    "package": "npx tsx scripts/export-html.ts && node scripts/bundle.js",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
