@@ -26,6 +26,13 @@ app.use(express.static(staticRoot, {
   }
 }));
 
+// Dedicated ads.txt route for Google AdSense crawler verification
+app.get('/ads.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.send('google.com, pub-3166168589952262, DIRECT, f08c47fec0942fa0\n');
+});
+
 // Fallback all routes to index.html for React SPA
 app.get('*', (req, res) => {
   const indexPath = path.join(staticRoot, 'index.html');

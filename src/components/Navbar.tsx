@@ -33,6 +33,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         return 'Bank of Maharashtra — Account Opening (13 Pages)';
       case 'sbi':
         return 'State Bank of India — Account Opening (7 Pages)';
+      case 'peek_karj':
+        return 'State Bank of India — पीक कर्ज मागणी, पिकपेरा स्वयंघोषणा व चतुःसीमा (3 Pages)';
       case 'custom':
         return 'Custom Uploaded PDF Document';
     }

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Upload, FileText, Building2, Landmark, CreditCard, Check, FilePlus2 } from 'lucide-react';
+import { Upload, FileText, Building2, Landmark, CreditCard, Check, FilePlus2, Sprout } from 'lucide-react';
 import { FormTemplateType } from '../types/formTypes';
 
 export interface CustomPdfUploaderProps {
@@ -10,6 +10,7 @@ export interface CustomPdfUploaderProps {
   onSelectSbi: () => void;
   onSelectStatement: () => void;
   onSelectAtm: () => void;
+  onSelectPeekKarj: () => void;
   onCustomPdfLoaded: (bytes: Uint8Array, fileName: string) => void;
   onFreshApplication?: () => void;
 }
@@ -22,6 +23,7 @@ export const CustomPdfUploader: React.FC<CustomPdfUploaderProps> = ({
   onSelectSbi,
   onSelectStatement,
   onSelectAtm,
+  onSelectPeekKarj,
   onCustomPdfLoaded,
   onFreshApplication,
 }) => {
@@ -40,6 +42,16 @@ export const CustomPdfUploader: React.FC<CustomPdfUploaderProps> = ({
   };
 
   const templates = [
+    {
+      id: 'peek_karj' as FormTemplateType,
+      title: 'SBI पीक कर्ज मागणी',
+      subtitle: 'पीक कर्ज, पिकपेरा, चतुःसीमा',
+      tag: '3 Pgs (मराठी)',
+      icon: Sprout,
+      activeColor: 'border-emerald-600 bg-emerald-50/80 text-emerald-950 ring-2 ring-emerald-500',
+      tagColor: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
+      onClick: onSelectPeekKarj,
+    },
     {
       id: 'statement' as FormTemplateType,
       title: 'Bank Application Letters',
@@ -106,7 +118,7 @@ export const CustomPdfUploader: React.FC<CustomPdfUploaderProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2.5">
         {templates.map((t) => {
           const Icon = t.icon;
           const isActive = activeTemplate === t.id && !isCustomPdf;

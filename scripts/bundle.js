@@ -134,6 +134,7 @@ For support, contact Vinodsingh Thakur at 9970996060.
   const nodeRootFiles = [
     'package.json',
     'package-lock.json',
+    'index.js',
     'server.js',
     'vite.config.ts',
     'tsconfig.json',

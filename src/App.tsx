@@ -6,12 +6,14 @@ import { applyStatementOverlay } from './utils/statementOverlay';
 import { applyBomOverlay } from './utils/bomOverlay';
 import { applySbiOverlay } from './utils/sbiOverlay';
 import { getAtmBasePdf, applyAtmOverlay } from './utils/atmOverlay';
+import { applyPeekKarjOverlay } from './utils/peekKarjOverlay';
 import { fetchAssetBytes } from './utils/assetHelper';
 import { Navbar } from './components/Navbar';
 import { PdfViewer } from './components/PdfViewer';
 import { CustomPdfUploader } from './components/CustomPdfUploader';
 import { StatementSection } from './components/FormSections/StatementSection';
 import { AtmCardSection } from './components/FormSections/AtmCardSection';
+import { PeekKarjSection } from './components/FormSections/PeekKarjSection';
 import { BranchSection } from './components/FormSections/BranchSection';
 import { PersonalSection } from './components/FormSections/PersonalSection';
 import { AddressSection } from './components/FormSections/AddressSection';
@@ -37,13 +39,15 @@ import {
   FilePlus2,
   Phone,
   Eye,
+  Sprout,
 } from 'lucide-react';
 
 const STATEMENT_PDF_PATH = '/assets/aistudio/bank_account_statement_6b113566.pdf';
 const BOM_PDF_PATH = '/assets/aistudio/bom_account_opening_form_c38c522e.pdf';
 const SBI_PDF_PATH = '/assets/aistudio/sbi_account_opening_31b5c984.pdf';
+const PEEK_KARJ_PDF_PATH = '/assets/aistudio/sbi_peek_karj_magni.pdf';
 
-type ActiveTab = 'statement' | 'atm' | 'branch' | 'personal' | 'address' | 'photo' | 'services' | 'nomination';
+type ActiveTab = 'statement' | 'atm' | 'peek' | 'branch' | 'personal' | 'address' | 'photo' | 'services' | 'nomination';
 
 export default function App() {
   const [formData, setFormData] = useState<SbiFormData>(SAMPLE_SBI_FORM_DATA);
@@ -70,6 +74,32 @@ export default function App() {
   const [mobileView, setMobileView] = useState<'form' | 'pdf'>('form');
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load SBI Peek Karj Magni (Crop Loan & Declaration - 3 Pages)
+  const handleSelectPeekKarj = useCallback(async () => {
+    try {
+      setIsGenerating(true);
+      let bytes: Uint8Array;
+      try {
+        bytes = await fetchAssetBytes(PEEK_KARJ_PDF_PATH);
+      } catch {
+        bytes = await fetchAssetBytes('/assets/aistudio/ilovepdf_merged_5fcb1fed.pdf');
+      }
+      setPdfTemplateBytes(bytes);
+      setCurrentPdfName('sbi_peek_karj_magni.pdf');
+      setActiveTemplate('peek_karj');
+      setIsCustomPdf(false);
+      setTotalPages(3);
+      setCurrentPage(1);
+      setActiveTab('peek');
+      setStatusMessage('Switched to SBI पीक कर्ज मागणी, पिकपेरा स्वयंघोषणा व चतुःसीमा (3 Pages)');
+      setTimeout(() => setStatusMessage(null), 3500);
+    } catch (err) {
+      console.error('Error loading SBI Peek Karj PDF:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, []);
 
   // Load Bank of Maharashtra ATM / VISA Debit Card Application (Form AR-35)
   const handleSelectAtm = useCallback(async () => {
@@ -146,10 +176,10 @@ export default function App() {
     }
   }, []);
 
-  // Initial load: Default to Bank of Maharashtra ATM / VISA Debit Card Application
+  // Initial load: Default to SBI Peek Karj Magni Form
   useEffect(() => {
-    handleSelectAtm();
-  }, [handleSelectAtm]);
+    handleSelectPeekKarj();
+  }, [handleSelectPeekKarj]);
 
   // Generate / overlay filled PDF
   const generateFilledPdf = useCallback(
@@ -162,8 +192,10 @@ export default function App() {
         const pagesCount = pdfDoc.getPageCount();
         setTotalPages(pagesCount);
 
-        // Apply ATM, statement, or full form overlay
-        if (activeTemplate === 'atm') {
+        // Apply Peek Karj, ATM, statement, or full form overlay
+        if (activeTemplate === 'peek_karj') {
+          await applyPeekKarjOverlay(pdfDoc, currentData, color);
+        } else if (activeTemplate === 'atm') {
           await applyAtmOverlay(pdfDoc, currentData, color);
         } else if (activeTemplate === 'statement' || pagesCount === 1) {
           await applyStatementOverlay(pdfDoc, currentData, color);
@@ -239,10 +271,15 @@ export default function App() {
 
   const handleDownload = () => {
     if (!pdfBlobUrl) return;
-    const namePart = formData.firstName ? `${formData.firstName}_${formData.lastName}` : 'Applicant';
-    const datePart = (formData.statementDate || formData.applicationDate || 'Form').replace(/[\/\s]/g, '');
+    const rawName = activeTemplate === 'peek_karj'
+      ? (formData.peekFarmerName || 'Vinodsingh_Thakur')
+      : (formData.firstName ? `${formData.firstName}_${formData.lastName}` : 'Applicant');
+    const namePart = rawName.replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_').slice(0, 30);
+    const datePart = (formData.peekDate || formData.statementDate || formData.applicationDate || '2026').replace(/[\/\s]/g, '');
     let prefix = 'Bank_Document';
-    if (activeTemplate === 'atm') {
+    if (activeTemplate === 'peek_karj') {
+      prefix = 'sbi_peek_karj_magni';
+    } else if (activeTemplate === 'atm') {
       prefix = 'BOM_ATM_Debit_Card_Application_AR35';
     } else if (activeTemplate === 'statement') {
       const bankPrefix = formData.statementBank === 'sbi' ? 'SBI' : 'BOM';
@@ -431,10 +468,16 @@ export default function App() {
   };
 
   // Tabs configuration based on active template
+  const isPeekKarjMode = activeTemplate === 'peek_karj';
   const isAtmMode = activeTemplate === 'atm';
   const isStatementMode = activeTemplate === 'statement';
 
-  const tabs: Array<{ id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }> = isAtmMode
+  const tabs: Array<{ id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }> = isPeekKarjMode
+    ? [
+        { id: 'peek', label: 'पीक कर्ज मागणी व पिकपेरा (3 Pages)', icon: Sprout },
+        { id: 'photo', label: 'पासपोर्ट फोटो (Photo)', icon: Camera },
+      ]
+    : isAtmMode
     ? [
         { id: 'atm', label: 'ATM / Debit Card (AR-35)', icon: CreditCard },
         { id: 'address', label: 'Address & Contact', icon: MapPin },
@@ -457,6 +500,12 @@ export default function App() {
 
   // Field stats
   const filledFieldsCount = [
+    formData.peekFarmerName,
+    formData.peekMobileNo,
+    formData.peekAadhaar,
+    formData.peekVillage,
+    formData.peekGatNo,
+    formData.peekTotalArea,
     formData.statementPeriodFrom,
     formData.statementPeriodTo,
     formData.firstName,
@@ -477,6 +526,9 @@ export default function App() {
   ].filter((v) => typeof v === 'string' && v.trim().length > 0).length;
 
   const getTemplateDisplayName = () => {
+    if (activeTemplate === 'peek_karj') {
+      return 'State Bank of India — पीक कर्ज मागणी, पिकपेरा स्वयंघोषणा व चतुःसीमा (3 Pages)';
+    }
     if (activeTemplate === 'atm') {
       return 'Bank of Maharashtra — Mahabank VISA Debit Card Application (Form AR-35)';
     }
@@ -662,7 +714,7 @@ export default function App() {
         onClear={handleClearForm}
         onFreshApplication={handleFreshApplication}
         onOpenWelcome={() => setShowFlash(true)}
-        hasData={Boolean(formData.firstName || formData.accountNumber || formData.primaryAccountNumber)}
+        hasData={Boolean(formData.firstName || formData.accountNumber || formData.primaryAccountNumber || formData.peekFarmerName)}
         activeTemplate={activeTemplate}
         customSubtitle={getTemplateDisplayName()}
       />
@@ -746,6 +798,7 @@ export default function App() {
           currentPdfName={currentPdfName}
           isCustomPdf={isCustomPdf}
           activeTemplate={activeTemplate}
+          onSelectPeekKarj={handleSelectPeekKarj}
           onSelectBom={handleSelectBom}
           onSelectSbi={handleSelectSbi}
           onSelectStatement={handleSelectStatement}
@@ -854,6 +907,9 @@ export default function App() {
 
             {/* Active Section Content */}
             <div className="pt-1">
+              {activeTab === 'peek' && (
+                <PeekKarjSection formData={formData} onChange={handleFieldChange} />
+              )}
               {activeTab === 'atm' && (
                 <AtmCardSection formData={formData} onChange={handleFieldChange} />
               )}

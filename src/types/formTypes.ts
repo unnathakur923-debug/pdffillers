@@ -473,6 +473,67 @@ export interface SbiFormData {
   secondaryAddOnCard1?: 'yes' | 'no';
   secondaryAddOnCard2?: 'yes' | 'no';
   telNo?: string;
+
+  // SBI Peek Karj Magni & Crop Sowing Declaration (3 Pages)
+  peekFarmerName?: string;
+  peekFatherHusbandName?: string;
+  peekMobileNo?: string;
+  peekVillage?: string;
+  peekTaluka?: string;
+  peekDistrict?: string;
+  peekGender?: 'male' | 'female';
+  peekAadhaar?: string;
+  peekLoanAcc1?: string;
+  peekLoanType1?: string;
+  peekLoanBank1?: string;
+  peekLoanBranch1?: string;
+  peekLoanAcc2?: string;
+  peekLoanType2?: string;
+  peekLoanBank2?: string;
+  peekLoanBranch2?: string;
+  peekLoanAcc3?: string;
+  peekLoanType3?: string;
+  peekLoanBank3?: string;
+  peekLoanBranch3?: string;
+  peekSavingsAcc?: string;
+  peekBankName?: string;
+  peekBranch?: string;
+  peekGatNo?: string;
+  peekTotalArea?: string;
+  peekCropName1?: string;
+  peekCropArea1?: string;
+  peekCropName2?: string;
+  peekCropArea2?: string;
+  peekCropName3?: string;
+  peekCropArea3?: string;
+  peekAttachAadhaar?: boolean;
+  peekAttach712?: boolean;
+  peekAttach8A?: boolean;
+  peekAttachFerfar?: boolean;
+  peekAttachPan?: boolean;
+
+  // Page 2: PMFBY Crop Sowing Table Rows
+  peekResidenceVillage?: string;
+  peekMauje?: string;
+  peekFarmerId?: string;
+  peekPlace?: string;
+  peekDate?: string;
+  peekCropRows?: Array<{
+    sr: string;
+    village: string;
+    gatNo: string;
+    cropName: string;
+    sowingDate: string;
+    areaHectare: string;
+    areaR: string;
+  }>;
+
+  // Page 3: Boundaries (चतुःसीमा)
+  peekFullAddress?: string;
+  peekBoundEast?: string;
+  peekBoundWest?: string;
+  peekBoundNorth?: string;
+  peekBoundSouth?: string;
 }
 
 export type LetterType =
@@ -527,7 +588,7 @@ export type LetterType =
   | 'failed_rtgs_complaint'
   | 'mobilebanking_unlock'
   | 'netbanking_password_reset';
-export type FormTemplateType = 'bom' | 'sbi' | 'statement' | 'atm' | 'custom';
+export type FormTemplateType = 'bom' | 'sbi' | 'statement' | 'atm' | 'custom' | 'peek_karj';
 export type InkColor = 'blue' | 'black';
 
 export interface FieldCoordinate {
