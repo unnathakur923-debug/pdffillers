@@ -98,31 +98,61 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
         {/* Center: Ink Color & Zoom Controls (Accessible on Mobile & Desktop) */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Ink color switch */}
-          <div className="flex items-center gap-0.5 sm:gap-1 bg-slate-800/80 rounded px-1 sm:px-1.5 py-0.5 border border-slate-700/60">
-            <Palette className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
-            <button
-              type="button"
-              onClick={() => onInkColorChange('blue')}
-              className={`px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-medium rounded transition-colors ${
-                inkColor === 'blue'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Blue
-            </button>
-            <button
-              type="button"
-              onClick={() => onInkColorChange('black')}
-              className={`px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-medium rounded transition-colors ${
-                inkColor === 'black'
-                  ? 'bg-slate-700 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Black
-            </button>
+          {/* Ink color radio group: Blue, Black, and Red ink */}
+          <div
+            role="radiogroup"
+            aria-label="Filled text ink color"
+            className="flex items-center gap-1 bg-slate-800/80 rounded-md px-1.5 py-0.5 border border-slate-700/60"
+          >
+            <Palette className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400 mr-0.5 shrink-0" aria-hidden="true" />
+            {(
+              [
+                {
+                  value: 'blue' as InkColor,
+                  label: 'Blue',
+                  swatch: 'bg-blue-500 border-blue-300',
+                  activeClass: 'bg-blue-600 text-white shadow-xs',
+                },
+                {
+                  value: 'black' as InkColor,
+                  label: 'Black',
+                  swatch: 'bg-slate-950 border-slate-400',
+                  activeClass: 'bg-slate-700 text-white shadow-xs',
+                },
+                {
+                  value: 'red' as InkColor,
+                  label: 'Red',
+                  swatch: 'bg-red-500 border-red-300',
+                  activeClass: 'bg-red-600 text-white shadow-xs',
+                },
+              ] as const
+            ).map((opt) => {
+              const isSelected = inkColor === opt.value;
+              return (
+                <label
+                  key={opt.value}
+                  className={`inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-medium rounded transition-colors cursor-pointer whitespace-nowrap select-none focus-within:ring-2 focus-within:ring-sky-400 ${
+                    isSelected
+                      ? opt.activeClass
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="pdf-ink-color"
+                    value={opt.value}
+                    checked={isSelected}
+                    onChange={() => onInkColorChange(opt.value)}
+                    className="sr-only"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={`w-2.5 h-2.5 rounded-full border shrink-0 ${opt.swatch}`}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              );
+            })}
           </div>
 
           {/* Zoom controls: accessible on mobile phones, tablets, and PCs */}
@@ -258,6 +288,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
             }}
           >
             <iframe
+              key={pdfBlobUrl}
               src={`${pdfBlobUrl}#page=${currentPage}&toolbar=0&navpanes=0`}
               title="Filled PDF Document Preview"
               className="w-full h-[480px] sm:h-[620px] lg:h-[720px] rounded-lg shadow-2xl bg-white border border-slate-700"

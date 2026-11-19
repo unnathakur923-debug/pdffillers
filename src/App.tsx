@@ -90,6 +90,7 @@ export default function App() {
   const [mobileView, setMobileView] = useState<'form' | 'pdf'>('form');
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const prevInkColorRef = useRef<InkColor>(inkColor);
 
   // Apply dynamic document title, description, canonical URL, and index/noindex robots meta
   useEffect(() => {
@@ -297,12 +298,20 @@ export default function App() {
     [pdfTemplateBytes, activeTemplate]
   );
 
-  // Debounced auto-generation on form change
+  // Auto-generation on form or ink color change (instant on ink switch, debounced on typing)
   useEffect(() => {
     if (!pdfTemplateBytes) return;
 
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
+    }
+
+    const inkChanged = prevInkColorRef.current !== inkColor;
+    prevInkColorRef.current = inkColor;
+
+    if (inkChanged) {
+      generateFilledPdf(formData, inkColor);
+      return;
     }
 
     debounceTimerRef.current = setTimeout(() => {

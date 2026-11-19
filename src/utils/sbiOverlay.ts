@@ -4,9 +4,18 @@ import { SbiFormData, InkColor } from '../types/formTypes';
 // Colors
 const COLOR_BLUE = rgb(0.04, 0.12, 0.42); // Official bank blue ballpoint ink
 const COLOR_BLACK = rgb(0.08, 0.08, 0.08); // Official black ink
+const COLOR_RED = rgb(0.72, 0.07, 0.09); // Official red ballpoint ink
 
 export function getInkRgb(inkColor: InkColor) {
-  return inkColor === 'black' ? COLOR_BLACK : COLOR_BLUE;
+  switch (inkColor) {
+    case 'black':
+      return COLOR_BLACK;
+    case 'red':
+      return COLOR_RED;
+    case 'blue':
+    default:
+      return COLOR_BLUE;
+  }
 }
 
 /**

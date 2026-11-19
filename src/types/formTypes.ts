@@ -589,7 +589,7 @@ export type LetterType =
   | 'mobilebanking_unlock'
   | 'netbanking_password_reset';
 export type FormTemplateType = 'bom' | 'sbi' | 'statement' | 'atm' | 'custom' | 'peek_karj';
-export type InkColor = 'blue' | 'black';
+export type InkColor = 'blue' | 'black' | 'red';
 
 export interface FieldCoordinate {
   id: string;
