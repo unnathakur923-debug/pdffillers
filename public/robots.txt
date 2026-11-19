@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /guides
+Allow: /about
+Allow: /contact
+Allow: /privacy-policy
+Allow: /ads.txt
+
+# Prevent indexing of thin archive, tag, category, search, or parameterized filter URLs
+Disallow: /tag/
+Disallow: /tags/
+Disallow: /archive/
+Disallow: /archives/
+Disallow: /category/
+Disallow: /author/
+Disallow: /search
+Disallow: /preview
+Disallow: /print
+Disallow: /*?*
+
+Sitemap: /sitemap.xml

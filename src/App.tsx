@@ -23,8 +23,16 @@ import { PhotoUploader } from './components/PhotoUploader';
 import { WelcomeFlashModal } from './components/WelcomeFlashModal';
 import { AdSenseBanner } from './components/AdSenseBanner';
 import { Footer } from './components/Footer';
+import { EditorialGuideSection } from './components/EditorialGuideSection';
 import {
-  CheckCircle2,
+  GuidesPage,
+  AboutPage,
+  ContactPage,
+  PrivacyPolicyPage,
+  ConsolidatedNoticePage,
+} from './components/TrustPages';
+import { resolveRouteFromLocation, applyDocumentSeo, RouteMeta } from './utils/seoManager';
+import {
   Info,
   Download,
   PenTool,
@@ -37,9 +45,11 @@ import {
   FileText,
   CreditCard,
   FilePlus2,
-  Phone,
   Eye,
   Sprout,
+  RotateCcw,
+  Sparkles,
+  BookOpen,
 } from 'lucide-react';
 
 const STATEMENT_PDF_PATH = '/assets/aistudio/bank_account_statement_6b113566.pdf';
@@ -67,13 +77,43 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  // Flash welcome screen on app launch
-  const [showFlash, setShowFlash] = useState<boolean>(true);
+  // Welcome modal is closed by default so tool & editorial content load immediately without arrival popups
+  const [showFlash, setShowFlash] = useState<boolean>(false);
+
+  // Clean SPA route & SEO state (/, /guides, /about, /contact, /privacy-policy, and noindex thin routes)
+  const [routeMeta, setRouteMeta] = useState<RouteMeta>(() =>
+    resolveRouteFromLocation(window.location.pathname, window.location.search)
+  );
+  const [currentPath, setCurrentPath] = useState<string>(() => window.location.pathname);
 
   // Mobile active tab view toggle: 'form' or 'pdf' preview
   const [mobileView, setMobileView] = useState<'form' | 'pdf'>('form');
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Apply dynamic document title, description, canonical URL, and index/noindex robots meta
+  useEffect(() => {
+    applyDocumentSeo(routeMeta);
+  }, [routeMeta]);
+
+  // Listen to browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+      setRouteMeta(resolveRouteFromLocation(window.location.pathname, window.location.search));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleNavigatePage = useCallback((path: string) => {
+    if (window.location.pathname !== path || window.location.search !== '') {
+      window.history.pushState({}, '', path);
+    }
+    setCurrentPath(path);
+    setRouteMeta(resolveRouteFromLocation(path, ''));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Load SBI Peek Karj Magni (Crop Loan & Declaration - 3 Pages)
   const handleSelectPeekKarj = useCallback(async () => {
@@ -180,6 +220,39 @@ export default function App() {
   useEffect(() => {
     handleSelectPeekKarj();
   }, [handleSelectPeekKarj]);
+
+  const handleLaunchTemplateFromGuide = useCallback(
+    (templateId: FormTemplateType) => {
+      handleNavigatePage('/');
+      switch (templateId) {
+        case 'peek_karj':
+          handleSelectPeekKarj();
+          break;
+        case 'bom':
+          handleSelectBom();
+          break;
+        case 'sbi':
+          handleSelectSbi();
+          break;
+        case 'atm':
+          handleSelectAtm();
+          break;
+        case 'statement':
+          handleSelectStatement();
+          break;
+        default:
+          handleSelectPeekKarj();
+      }
+    },
+    [
+      handleNavigatePage,
+      handleSelectPeekKarj,
+      handleSelectBom,
+      handleSelectSbi,
+      handleSelectAtm,
+      handleSelectStatement,
+    ]
+  );
 
   // Generate / overlay filled PDF
   const generateFilledPdf = useCallback(
@@ -699,96 +772,127 @@ export default function App() {
     return `Custom PDF: ${currentPdfName}`;
   };
 
+  const hasAnyData = Boolean(
+    formData.firstName ||
+      formData.accountNumber ||
+      formData.primaryAccountNumber ||
+      formData.peekFarmerName
+  );
+
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col text-slate-800">
-      {/* Flash Welcome Screen on app launch / clicking link */}
+    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
+      {/* Optional Welcome Info Modal (only opened on explicit click, never on arrival) */}
       <WelcomeFlashModal
         isOpen={showFlash}
         onEnter={() => setShowFlash(false)}
       />
 
-      {/* Top Header */}
+      {/* Top Navigation Bar */}
       <Navbar
+        activePage={routeMeta.page}
+        onNavigatePage={handleNavigatePage}
         onDownload={handleDownload}
-        onFillSample={handleFillSample}
-        onClear={handleClearForm}
-        onFreshApplication={handleFreshApplication}
-        onOpenWelcome={() => setShowFlash(true)}
-        hasData={Boolean(formData.firstName || formData.accountNumber || formData.primaryAccountNumber || formData.peekFarmerName)}
-        activeTemplate={activeTemplate}
-        customSubtitle={getTemplateDisplayName()}
       />
 
-      {/* Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-4">
-        {/* Flashing Announcement & Contact Header */}
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-500 p-[2px] shadow-sm animate-pulse">
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 px-4 py-2.5 rounded-[10px] text-white">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-              </span>
-              <div className="text-xs font-bold tracking-wide truncate">
-                <span className="text-amber-300 font-extrabold uppercase">Thakur Xerox Welcomes You:</span>{' '}
-                <span className="text-slate-100">Contact Vinodsingh Arjunsingh Thakur</span>{' '}
-                <span className="text-amber-300 font-extrabold">— 9970996060</span>
-              </div>
-            </div>
+      {/* Route Views */}
+      {routeMeta.page === 'guides' && (
+        <main className="flex-1 w-full">
+          <GuidesPage
+            onNavigatePage={handleNavigatePage}
+            onLaunchTemplate={handleLaunchTemplateFromGuide}
+          />
+        </main>
+      )}
 
-            <div className="flex items-center gap-2 shrink-0">
-              <a
-                href="tel:9970996060"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow-xs transition-transform active:scale-95"
-              >
-                <Phone className="w-3.5 h-3.5 fill-slate-950" />
-                <span>Call 9970996060</span>
-              </a>
-              <button
-                type="button"
-                onClick={() => setShowFlash(true)}
-                className="text-[11px] text-slate-300 hover:text-white underline decoration-slate-500 underline-offset-2 ml-1 cursor-pointer"
-              >
-                Flash Intro
-              </button>
-            </div>
-          </div>
-        </div>
+      {routeMeta.page === 'about' && (
+        <main className="flex-1 w-full">
+          <AboutPage
+            onNavigatePage={handleNavigatePage}
+            onLaunchTemplate={handleLaunchTemplateFromGuide}
+          />
+        </main>
+      )}
 
-        {/* AdSense Placement 1: Header Area */}
-        <AdSenseBanner
-          slot="header-banner"
-          format="horizontal"
-          className="bg-white/80 border border-slate-200/90 rounded-xl"
-        />
+      {routeMeta.page === 'contact' && (
+        <main className="flex-1 w-full">
+          <ContactPage onNavigatePage={handleNavigatePage} />
+        </main>
+      )}
 
-        {/* Banner with status and stats */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-4 py-3 border border-slate-200 rounded-xl shadow-2xs">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-            <div>
-              <h1 className="text-sm font-bold text-slate-900">
+      {routeMeta.page === 'privacy' && (
+        <main className="flex-1 w-full">
+          <PrivacyPolicyPage onNavigatePage={handleNavigatePage} />
+        </main>
+      )}
+
+      {routeMeta.page === 'thin' && (
+        <main className="flex-1 w-full">
+          <ConsolidatedNoticePage
+            pathname={currentPath}
+            onNavigatePage={handleNavigatePage}
+          />
+        </main>
+      )}
+
+      {/* Primary Tool Page (/) with Complete On-Page Editorial Depth */}
+      {routeMeta.page === 'tool' && (
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5">
+        {/* Clean Editorial Tool Header & Workspace Actions */}
+        <div className="bg-white px-5 py-4 border border-slate-200 rounded-xl space-y-3">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="space-y-1 max-w-3xl">
+              <p className="text-xs font-medium text-slate-500">
+                DocuFill Studio by Thakur Xerox · {totalPages} {totalPages === 1 ? 'Page' : 'Pages'} · {filledFieldsCount} Fields Mapped · 100% Local Browser Processing
+              </p>
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight text-balance">
                 {getTemplateDisplayName()}
               </h1>
-              <p className="text-xs text-slate-500">
-                Direct field mapping, authentic line alignment, live PDF preview, and instant download.
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Prepare print-ready, box-aligned Indian banking and Marathi crop loan PDFs locally in your browser. Review step-by-step instructions, checklists, and FAQs directly below the workspace.
               </p>
             </div>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs">
-            <div className="flex items-center gap-1.5 text-slate-600 font-medium">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>{filledFieldsCount} Fields Mapped</span>
-            </div>
-            <span className="text-slate-300">|</span>
-            <div className="flex items-center gap-1.5 text-slate-600 font-medium">
-              <span>{totalPages} {totalPages === 1 ? 'Page' : 'Pages'}</span>
-            </div>
-            <span className="text-slate-300">|</span>
-            <div className="flex items-center gap-1 text-[11px] text-slate-600 font-medium bg-slate-100 px-2.5 py-1 rounded">
-              <PenTool className="w-3 h-3 text-slate-500" />
-              <span>Physical Signature on Printed Copy</span>
+            {/* Workspace Quick Controls */}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleFreshApplication}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap cursor-pointer"
+                title="Start a fresh, clean application for a new applicant"
+              >
+                <FilePlus2 className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Fresh Application</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleFillSample}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 rounded-lg border border-slate-300 transition-colors whitespace-nowrap cursor-pointer"
+                title="Populate form with verified sample data"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>Fill Sample</span>
+              </button>
+
+              {hasAnyData && (
+                <button
+                  type="button"
+                  onClick={handleClearForm}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors whitespace-nowrap cursor-pointer"
+                  title="Clear all fields"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Clear</span>
+                </button>
+              )}
+
+              <a
+                href="#editorial-guide"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 hover:text-emerald-800 rounded-lg hover:bg-slate-100 transition-colors whitespace-nowrap"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>How It Works &amp; FAQs</span>
+              </a>
             </div>
           </div>
         </div>
@@ -809,18 +913,11 @@ export default function App() {
 
         {/* Status Toast */}
         {statusMessage && (
-          <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg text-xs font-medium animate-fadeIn">
+          <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg text-xs font-medium">
             <Info className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{statusMessage}</span>
           </div>
         )}
-
-        {/* AdSense Placement 2: Below PDF Upload Section */}
-        <AdSenseBanner
-          slot="below-upload-banner"
-          format="auto"
-          className="bg-white/80 border border-slate-200/90 rounded-xl"
-        />
 
         {/* Mobile View Toggle (visible only on < lg screens for optimal phone UX) */}
         <div className="lg:hidden flex items-center bg-slate-200/80 p-1 rounded-xl shadow-inner text-xs font-semibold">
@@ -941,13 +1038,6 @@ export default function App() {
               )}
             </div>
 
-            {/* AdSense Placement 3: Between Content Sections */}
-            <AdSenseBanner
-              slot="between-content-banner"
-              format="auto"
-              className="bg-slate-50/80 border border-slate-200/90 rounded-lg my-2"
-            />
-
             {/* Mobile-only shortcut to switch to PDF preview */}
             <div className="lg:hidden pt-2">
               <button
@@ -1016,10 +1106,25 @@ export default function App() {
             />
           </div>
         </div>
-      </main>
 
-      {/* Footer Area with AdSense Banner 4 and Thakur Xerox Contact / Privacy Policy */}
-      <Footer />
+        {/* Balanced AdSense Placement Between Tool Workspace & Editorial Publisher Guide */}
+        <AdSenseBanner
+          slot="between-content-banner"
+          format="horizontal"
+          className="bg-white border border-slate-200 rounded-xl my-4"
+        />
+
+        {/* Original On-Page Editorial Depth: How It Works, Step-by-Step Guide, Use Cases, Reference Table & FAQs */}
+        <EditorialGuideSection
+          activeTemplate={activeTemplate}
+          onSelectTemplate={handleLaunchTemplateFromGuide}
+          onNavigatePage={handleNavigatePage}
+        />
+      </main>
+      )}
+
+      {/* Footer Area with Navigation, Contact & Privacy Links */}
+      <Footer activePage={routeMeta.page} onNavigatePage={handleNavigatePage} />
     </div>
   );
 }
