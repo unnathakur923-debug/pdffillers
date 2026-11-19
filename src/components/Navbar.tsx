@@ -10,10 +10,11 @@ interface NavbarProps {
 
 const NAV_ITEMS: Array<{ label: string; path: string; page: SitePage }> = [
   { label: 'Form Filler', path: '/', page: 'tool' },
-  { label: 'Guides & FAQs', path: '/guides', page: 'guides' },
+  { label: 'Guides', path: '/guides', page: 'guides' },
   { label: 'About Us', path: '/about', page: 'about' },
   { label: 'Contact', path: '/contact', page: 'contact' },
   { label: 'Privacy Policy', path: '/privacy-policy', page: 'privacy' },
+  { label: 'Terms', path: '/terms', page: 'terms' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -32,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-8 h-16">
+        <div className="flex items-center justify-between gap-6 h-16">
           {/* Zone 1: Clean single-line Brand Wordmark */}
           <a
             href="/"
@@ -42,10 +43,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             Thakur Xerox
           </a>
 
-          {/* Zone 2: 5 Clear Top-Level Text Navigation Links */}
+          {/* Zone 2: Clear Top-Level Text Navigation Links */}
           <nav
             aria-label="Primary Navigation"
-            className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600"
+            className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium text-slate-600"
           >
             {NAV_ITEMS.map((item) => {
               const isActive = activePage === item.page;

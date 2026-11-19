@@ -357,6 +357,16 @@ export const EditorialGuideSection: React.FC<EditorialGuideSectionProps> = ({
           >
             Privacy Policy
           </a>
+          <a
+            href="/terms"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigatePage('/terms');
+            }}
+            className="text-emerald-700 hover:text-emerald-900 underline underline-offset-4 whitespace-nowrap"
+          >
+            Terms &amp; Disclaimer
+          </a>
         </div>
       </div>
     </section>

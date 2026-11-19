@@ -1,4 +1,4 @@
-export type SitePage = 'tool' | 'guides' | 'about' | 'contact' | 'privacy' | 'thin';
+export type SitePage = 'tool' | 'guides' | 'about' | 'contact' | 'privacy' | 'terms' | 'thin';
 
 export interface RouteMeta {
   page: SitePage;
@@ -88,10 +88,21 @@ export function resolveRouteFromLocation(pathname: string, search: string): Rout
     case '/privacy':
       return {
         page: 'privacy',
-        title: 'Privacy Policy & AdSense Disclosure – DocuFill Studio',
+        title: 'Privacy Policy & Google AdSense Disclosure – DocuFill Studio',
         description:
-          'Read how DocuFill Studio processes all banking forms 100% locally in your browser without cloud storage, alongside our Google AdSense and cookie policy.',
+          'Read how DocuFill Studio handles form inputs 100% locally in your browser, our Google AdSense and DoubleClick DART cookie disclosure, and how to opt out of personalized ads.',
         canonicalPath: '/privacy-policy',
+        robots: hasThinQuery ? 'noindex, follow' : 'index, follow',
+      };
+    case '/terms':
+    case '/terms-of-service':
+    case '/disclaimer':
+      return {
+        page: 'terms',
+        title: 'Terms of Service & Disclaimer – Thakur Xerox & DocuFill Studio',
+        description:
+          'Review usage rules, non-affiliation disclaimer, Marathi transliteration and form-alignment limitations, and user responsibilities for DocuFill Studio.',
+        canonicalPath: '/terms',
         robots: hasThinQuery ? 'noindex, follow' : 'index, follow',
       };
     case '/':

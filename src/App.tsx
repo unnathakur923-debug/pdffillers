@@ -29,6 +29,7 @@ import {
   AboutPage,
   ContactPage,
   PrivacyPolicyPage,
+  TermsPage,
   ConsolidatedNoticePage,
 } from './components/TrustPages';
 import { resolveRouteFromLocation, applyDocumentSeo, RouteMeta } from './utils/seoManager';
@@ -831,6 +832,12 @@ export default function App() {
       {routeMeta.page === 'privacy' && (
         <main className="flex-1 w-full">
           <PrivacyPolicyPage onNavigatePage={handleNavigatePage} />
+        </main>
+      )}
+
+      {routeMeta.page === 'terms' && (
+        <main className="flex-1 w-full">
+          <TermsPage onNavigatePage={handleNavigatePage} />
         </main>
       )}
 

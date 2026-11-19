@@ -504,6 +504,6 @@ export const FAQ_ITEMS: FaqEntry[] = [
     category: 'Support',
     question: 'Who can I contact if I need help preparing a form or printing at Thakur Xerox?',
     answer:
-      'You can contact proprietor Vinodsingh Arjunsingh Thakur directly at +91 9970996060 (Phone or WhatsApp) during business hours (Monday to Saturday, 9:30 AM – 8:00 PM IST), or visit our Contact Us page for assistance details.',
+      'You can email our support desk at unnathakur923@gmail.com or contact proprietor Vinodsingh Arjunsingh Thakur at +91 9970996060 (Phone or WhatsApp) during business hours (Monday to Saturday, 9:30 AM – 8:00 PM IST), or submit an inquiry on our Contact Us page.',
   },
 ];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, MessageCircle, ShieldCheck } from 'lucide-react';
+import { Phone, MessageCircle, ShieldCheck, Mail } from 'lucide-react';
 import { AdSenseBanner } from './AdSenseBanner';
 import { SitePage } from '../utils/seoManager';
 
@@ -99,6 +99,15 @@ export const Footer: React.FC<FooterProps> = ({ activePage, onNavigatePage }) =>
                   Privacy Policy &amp; AdSense Disclosure
                 </a>
               </li>
+              <li>
+                <a
+                  href="/terms"
+                  onClick={(e) => handleLink(e, '/terms')}
+                  className="hover:text-white transition-colors"
+                >
+                  Terms of Service &amp; Disclaimer
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -111,6 +120,15 @@ export const Footer: React.FC<FooterProps> = ({ activePage, onNavigatePage }) =>
               <p className="font-semibold text-white">Vinodsingh Arjunsingh Thakur</p>
               <p className="text-slate-400">Thakur Xerox · Maharashtra, India</p>
               <p className="text-slate-400">Mon – Sat · 9:30 AM – 8:00 PM IST</p>
+              <p className="pt-0.5">
+                <a
+                  href="mailto:unnathakur923@gmail.com"
+                  className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5 shrink-0" />
+                  <span>unnathakur923@gmail.com</span>
+                </a>
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <a
@@ -157,6 +175,13 @@ export const Footer: React.FC<FooterProps> = ({ activePage, onNavigatePage }) =>
               className="hover:text-slate-300 transition-colors"
             >
               Privacy Policy
+            </a>
+            <a
+              href="/terms"
+              onClick={(e) => handleLink(e, '/terms')}
+              className="hover:text-slate-300 transition-colors"
+            >
+              Terms &amp; Disclaimer
             </a>
           </div>
         </div>
